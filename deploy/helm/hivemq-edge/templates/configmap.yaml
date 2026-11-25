@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "hivemq-edge.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: {{ include "hivemq-edge.name" . }}
+data:
+  config.xml: |
+    <?xml version="1.0"?>
+    <hivemq>
+      <listeners>
+        <tcp-listener>
+          <port>{{ .Values.service.mqttPort }}</port>
+          <bind-address>0.0.0.0</bind-address>
+          <name>edge-tcp-listener</name>
+        </tcp-listener>
+        <http-listener>
+          <port>{{ .Values.service.httpPort }}</port>
+          <bind-address>0.0.0.0</bind-address>
+          <name>edge-http-listener</name>
+        </http-listener>
+      </listeners>
+    </hivemq>

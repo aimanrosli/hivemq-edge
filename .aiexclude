@@ -1,0 +1,27 @@
+# Exclude build outputs and binaries from AI scanning/indexing
+.gradle/
+build/
+**/build/
+bin/
+**/bin/
+out/
+**/out/
+
+# Dependencies and caches
+node_modules/
+**/node_modules/
+.idea/
+.vscode/
+
+# Logs, docs, and assets
+*.log
+**/*.log
+docs/
+**/*.gif
+**/*.svg
+**/*.png
+**/*.jpg
+
+# Large test payloads
+/hivemq-edge/src/test/resources/
+**/src/test/resources/

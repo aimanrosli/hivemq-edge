@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hivemq-edge.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "hivemq-edge.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hivemq-edge.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "hivemq-edge.name" . }}
+    spec:
+      {{- if .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.image.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: hivemq-edge
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: mqtt
+              containerPort: {{ .Values.service.mqttPort }}
+              protocol: TCP
+            - name: http-ui
+              containerPort: {{ .Values.service.httpPort }}
+              protocol: TCP
+          env:
+            {{- if .Values.vault.enabled }}
+            - name: HIVEMQ_EDGE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vault.secretName }}
+                  key: {{ .Values.vault.secretKey }}
+            {{- end }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/hivemq-edge/conf/config.xml
+              subPath: config.xml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "hivemq-edge.fullname" . }}-config
